@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Perdóname ❤️</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: linear-gradient(180deg,#1b1f3a 0%, #3b2b52 60%, #6b2b6d 100%);
+      overflow:hidden;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .card{
+      position:relative;
+      z-index:10;
+      max-width:880px;
+      width:90%;
+      text-align:center;
+      padding:36px 28px;
+      border-radius:18px;
+      backdrop-filter: blur(6px) saturate(120%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    h1{font-size:2rem;margin-bottom:8px}
+    p{font-size:1.1rem;opacity:0.95;margin-bottom:18px}
+    .small{font-size:.95rem;opacity:.9}
+    .controls{display:flex;gap:12px;justify-content:center;margin-top:12px}
+    button{
+      padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:600;
+      background:linear-gradient(90deg,#ff6b9e,#ff3d81);color:white;box-shadow:0 6px 18px rgba(255,60,120,0.18);
+    }
+    button.secondary{background:transparent;border:2px solid rgba(255,255,255,0.12)}
+    .heart{
+      position:fixed;
+      top:-10vh;
+      font-size:32px;
+      pointer-events:none;
+      z-index:5;
+      transform-origin:center;
+      will-change:transform,opacity,top;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      user-select:none;
+    }
+    @keyframes fall {
+      0%{transform: translateY(-20vh) rotate(0deg); opacity:0}
+      10%{opacity:1}
+      100%{transform: translateY(120vh) rotate(720deg); opacity:0.9}
+    }
+    .footer-note{margin-top:10px;font-size:.9rem;opacity:.85}
+    @media (min-width:720px){
+      h1{font-size:2.6rem}
+      p{font-size:1.2rem}
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Mi amor, perdóname ❤️</h1>
+    <p>Perdóname por mis errores. Sé que a veces no soy fácil de entender, pero quiero que sepas que me esfuerzo por ser mejor cada día. <strong>Te amo con todo mi corazón</strong> y no quiero perder lo que tenemos.</p>
+    <p class="small">— Con todo mi amor, <em>Ernesto</em></p>
+
+    <div class="controls">
+      <button id="startBtn">Lluvia de corazones</button>
+      <button id="stopBtn" class="secondary">Detener</button>
+      <button id="downloadBtn" class="secondary">Descargar HTML</button>
+    </div>
+    <p class="footer-note">Súbelo a GitHub Pages y compártelo conmigo 💕</p>
+  </main>
+
+  <script>
+    const MAX_HEARTS = 40;
+    const INTERVAL_MS = 300;
+    const HEARTS = ['❤️','💖','💘','💞','💓','💕'];
+
+    let running = false;
+    let spawnInterval = null;
+
+    function random(min, max){ return Math.random()*(max-min)+min }
+
+    function createHeart(){
+      const el = document.createElement('div');
+      el.className = 'heart';
+      el.innerText = HEARTS[Math.floor(Math.random()*HEARTS.length)];
+
+      const size = Math.round(random(20,56));
+      el.style.fontSize = size + 'px';
+      el.style.left = random(2,96)+'%';
+
+      const duration = random(6,14);
+      const delay = random(-2,2);
+      el.style.animation = `fall ${duration}s linear ${delay}s forwards`;
+
+      const drift = random(-40,40);
+      el.style.transform = `translateX(${drift}px)`;
+
+      el.style.rotate = random(0,360) + 'deg';
+
+      document.body.appendChild(el);
+
+      setTimeout(()=>{
+        el.remove();
+      }, (duration + Math.abs(delay)) * 1000 + 200);
+    }
+
+    function startRain(){
+      if(running) return;
+      running = true;
+      spawnInterval = setInterval(()=>{
+        const count = document.querySelectorAll('.heart').length;
+        if(count < MAX_HEARTS) createHeart();
+      }, INTERVAL_MS);
+      for(let i=0;i<8;i++) setTimeout(createHeart,i*80);
+    }
+
+    function stopRain(){
+      running = false;
+      clearInterval(spawnInterval);
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startRain);
+    document.getElementById('stopBtn').addEventListener('click', stopRain);
+
+    document.getElementById('downloadBtn').addEventListener('click', ()=>{
+      const doc = '<!doctype html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([doc], {type:'text/html;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'index.html';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    window.addEventListener('load', ()=>{
+      startRain();
+    });
+  </script>
+</body>
+</html>
